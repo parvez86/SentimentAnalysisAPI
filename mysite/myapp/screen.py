@@ -1,6 +1,12 @@
 from transformers import BertTokenizer, BertForSequenceClassification, TFAutoModel, AutoTokenizer
 from transformers import pipeline
 import re
+import torch
+import joblib
+from django.conf import settings
+
+MODEL_FINE_TUNER_PATH = str(settings.BASE_DIR)+'/model/best_model_state.bin'
+isFineTuned = False
 
 
 def preprocess_text(text) -> str:
@@ -26,6 +32,17 @@ def screen(data) -> str:
 
     model = BertForSequenceClassification.from_pretrained("ahmedrachid/FinancialBERT-Sentiment-Analysis", num_labels=3)
     tokenizer = BertTokenizer.from_pretrained("ahmedrachid/FinancialBERT-Sentiment-Analysis")
+
+    global isFineTuned
+    if not isFineTuned:
+        print("hi")
+        # print(settings.BASE_DIR)
+        print("Fine tuned parameter: ", model.state_dict())
+        print("hi..")
+        # model.load_state_dict(joblib.load(MODEL_FINE_TUNER_PATH))
+        model.load_state_dict(torch.load(MODEL_FINE_TUNER_PATH))
+        print("hi...")
+        isFineTuned = True
 
     nlp = pipeline("sentiment-analysis", model=model, tokenizer=tokenizer)
     result = nlp([data])

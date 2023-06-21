@@ -30,6 +30,7 @@ class SentimentViewSet(viewsets.ViewSet):
     # def list(self, request):
     #     serializer = SentimentSerializer()
     #     return Response({}, status=HTTP_200_OK)
+    # isFineTuned = False
 
     def create(self, request):
         # check request format
@@ -47,6 +48,11 @@ class SentimentViewSet(viewsets.ViewSet):
                              "valid format": context}, status=HTTP_400_BAD_REQUEST)
         sentiment = None
         try:
+            # global isFineTuned
+            # if not isFineTuned:
+            #     sentiment = screen.screen(text, False)
+            #     isFineTuned = True
+            # else:
             sentiment = screen.screen(text)
             print("sentiment: ", sentiment)
         except (TypeError, AttributeError, IOError) as err:

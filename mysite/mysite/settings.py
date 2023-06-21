@@ -83,6 +83,10 @@ REST_FRAMEWORK = {
     'DEFAULT_METADATA_CLASS': None,
 }
 
+if DEBUG:
+    # the default value
+    REST_FRAMEWORK['DEFAULT_METADATA_CLASS']: 'rest_framework.metadata.SimpleMetadata'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',

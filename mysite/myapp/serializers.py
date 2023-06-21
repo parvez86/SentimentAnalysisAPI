@@ -12,5 +12,4 @@ class SentimentSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         sentiment = Sentiment.objects.create(**validated_data)
-        # Token.objects.create(user=user)
         return sentiment
