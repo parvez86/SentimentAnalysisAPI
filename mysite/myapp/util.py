@@ -1,19 +1,19 @@
-import os
-import pandas as pd
-from sklearn.model_selection import train_test_split
+import re
 
-def numerals_normalize( df ):
 
-  for i in range(len(df)):
-    words = df['Data'][i].split()
-    st = ''
-    for word in words:
-      if(st != ''):
-        st += ' '
-      if(word[0]>='0' and word[0] <='9' and word[-1]>='0' and word[-1] <='9'):
-        st += "CC"
-      else:
-        st += word
-    df['Data'][i] = st
+def process_text(text):
+    text = str(text)
+    TAG_RE = re.compile(r'<[^>]+>')
+    # Removing html tags
+    text = TAG_RE.sub('', text)
 
-  return df
+    # Remove punctuations and numbers
+    text = re.sub('[^a-zA-Z]', ' ', text)
+
+    # Single character removal
+    sentence = re.sub(r"s+[a-zA-Z]s+", ' ', text)
+    text = re.sub(r'[^\w\s\']', '', text)
+    text = re.sub(' +', ' ', text).lower()
+    # Removing multiple spaces
+    sentence = ' '.join([word for word in sentence.split() if len(word) > 1])
+    return text

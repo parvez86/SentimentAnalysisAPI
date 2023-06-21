@@ -47,13 +47,14 @@ class SentimentViewSet(viewsets.ViewSet):
             return Response({"error": "invalid format",
                              "valid format": context}, status=HTTP_400_BAD_REQUEST)
         sentiment = None
+        model = None
         try:
             # global isFineTuned
             # if not isFineTuned:
             #     sentiment = screen.screen(text, False)
             #     isFineTuned = True
             # else:
-            sentiment = screen.screen(text)
+            model, sentiment = screen.screen(model, text)
             print("sentiment: ", sentiment)
         except (TypeError, AttributeError, IOError) as err:
             return Response({"error": err}, status=HTTP_500_INTERNAL_SERVER_ERROR)

@@ -1,49 +1,107 @@
-from transformers import BertTokenizer, BertForSequenceClassification, TFAutoModel, AutoTokenizer
-from transformers import pipeline
-import re
-import torch
-import joblib
 from django.conf import settings
+from django.conf import settings
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.svm import LinearSVC
+import pandas as pd
+import numpy as np
 
-MODEL_FINE_TUNER_PATH = str(settings.BASE_DIR)+'/model/best_model_state.bin'
+from myapp.Word2VecVectorizer import Word2VecVectorizer
+from myapp.util import process_text
+import gensim
+import os
+
 isFineTuned = False
+MODEL_PATH = str(settings.BASE_DIR)+ '\embeddings\cc.en.300.vec'
+# MODEL_PATH = '../embeddings/cc.en.300.vec'
+DATA_PATH = str(settings.BASE_DIR) + '\data'
+# DATA_PATH = '../data'
+SENTIMENT_NAMES = ["negative", "neutral", "positive"]
+model = None
 
 
-def preprocess_text(text) -> str:
-    TAG_RE = re.compile(r'<[^>]+>')
+def build_model():
+    # model = fasttext.load_model(MODEL_PATH)
+    # model = fasttext.train_supervised(input=r'train_reviews.csv', label_prefix='__label__')
+    model_path = "embeddings/cc.en.300.vec"
+    data_path = "data/train_df.csv"
 
-    # Removing html tags
-    sentence = TAG_RE.sub('', text)
+    path_parent = os.path.dirname(os.getcwd())
+    # os.chdir( path_parent )
+    print("data path: ", data_path)
+    df_train = pd.read_csv(data_path, encoding='ISO-8859-1')
 
-    # Remove punctuations and numbers
-    sentence = re.sub('[^a-zA-Z]', ' ', sentence)
+    # remove null
+    if df_train.isnull().values.any():
+        print(df_train.isnull().sum())
+        df_train = df_train.dropna()
 
-    # Single character removal
-    sentence = re.sub(r"s+[a-zA-Z]s+", ' ', sentence)
+    # remove empty
+    # df_train['text'] = df_train[df_train['text'] != ""]
+    print("train data")
+    X_train = df_train['text']
+    X_train.apply(process_text)
+    y_train = df_train["label"]
 
-    # Removing multiple spaces
-    sentence = ' '.join([word for word in sentence.split() if len(word) > 1])
-    return sentence
+    c = 10
+    print("model path: ", model_path)
+    ft = gensim.models.KeyedVectors.load_word2vec_format(model_path, encoding="ISO-8859-1")
+    print("vectors")
+    vectorizer = Word2VecVectorizer(ft)
+    Xtrain = vectorizer.fit_transform(X_train)
+
+    linear = LinearSVC(C=c, penalty='l2', loss='squared_hinge')
+
+    linear.fit(Xtrain, y_train)
+    return linear
 
 
-def screen(data) -> str:
-    data = preprocess_text(data)
-    # print(data)
+def predict(model, review):
+    print("review: ", review)
+    pred = model.predict([review])
+    print("pred: ", pred)
+    return pred
 
-    model = BertForSequenceClassification.from_pretrained("ahmedrachid/FinancialBERT-Sentiment-Analysis", num_labels=3)
-    tokenizer = BertTokenizer.from_pretrained("ahmedrachid/FinancialBERT-Sentiment-Analysis")
 
-    global isFineTuned
-    if not isFineTuned:
-        print("hi")
-        # print(settings.BASE_DIR)
-        print("Fine tuned parameter: ", model.state_dict())
-        print("hi..")
-        # model.load_state_dict(joblib.load(MODEL_FINE_TUNER_PATH))
-        model.load_state_dict(torch.load(MODEL_FINE_TUNER_PATH))
-        print("hi...")
-        isFineTuned = True
+def get_classification_report(model):
+    df_test = pd.read_csv('data/test_df.csv', encoding='ISO-8859-1')
+    df_test.text.apply(process_text)
+    y_pred = model.predict(df_test.text)
+    y_true = df_test.label
+    print(y_pred)
+    report = classification_report(y_true, y_pred)
+    print(report)
 
-    nlp = pipeline("sentiment-analysis", model=model, tokenizer=tokenizer)
-    result = nlp([data])
-    return result[0]['label']
+
+def get_model():
+    global model
+    if not model:
+        print("model 1st loading")
+        model = build_model()
+        print("model loaded")
+        # print("model ",)
+    return model
+
+
+def screen(text):
+    text = process_text(text)
+    global model
+    if not model:
+        print("None")
+    else:
+        print("model exist")
+    model = get_model()
+    # test_x = pd.Series(list(text))
+    print("data: ", [text])
+    print()
+    pred = model.predict(text)
+    print(model)
+    # pred=2
+    print("prediction: ", pred)
+    return model, SENTIMENT_NAMES[pred]
+
+
+if __name__ == '__main__':
+    model_path = '../embeddings/ccc.en.300.vec'
+    model = build_model()
+    get_classification_report(model)
+    print("Main thread")

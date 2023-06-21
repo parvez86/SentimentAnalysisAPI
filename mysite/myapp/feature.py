@@ -20,12 +20,17 @@ from scipy.sparse import hstack
 from sklearn.metrics import confusion_matrix
 import numpy as np
 import gensim
+from sklearn.metrics import classification_report
 # from django.conf import settings
 
 # DATASET_PATH = str(settings.BASE_DIR+'../dataset/')
 
-def RecallPrecisionFScore(y_test, pred):
-    arr = confusion_matrix(y_test, pred)
+
+def RecallPrecisionFScore(y_test, y_pred):
+    report = classification_report(y_test, y_pred)
+    print("report: ", report)
+
+    arr = confusion_matrix(y_test, y_pred)
 
     fp = arr[0][1] + arr[0][2] + arr[1][0] + arr[1][2] + arr[2][1] + arr[2][2]
     fn = arr[1][0] + arr[2][0] + arr[0][1] + arr[2][1] + arr[0][2] + arr[1][2]
@@ -90,13 +95,13 @@ class Word2VecVectorizer:
 def embedding_feature_based_combination(df_train, df_test, c, ux, uy, cx, cy):
     path_parent = os.path.dirname(os.getcwd())
     # os.chdir( path_parent )
-    ft = gensim.models.KeyedVectors.load_word2vec_format(os.getcwd() + "/embeddings/cc.bn.300.bin/cc.bn.300.vec")
+    ft = gensim.models.KeyedVectors.load_word2vec_format("../embeddings/cc.en.300.vec")
 
-    X_train = df_train["Data"]
-    X_test = df_test["Data"]
+    X_train = df_train["text"]
+    X_test = df_test["text"]
 
-    y_train = df_train["Label"]
-    y_test = df_test["Label"]
+    y_train = df_train["label"]
+    y_test = df_test["label"]
 
     vectorizer = Word2VecVectorizer(ft)
     Xtrain = vectorizer.fit_transform(X_train)
@@ -131,13 +136,13 @@ def embedding_feature(df_train, df_test, c):
     path_parent = os.path.dirname(os.getcwd())
     # os.chdir( path_parent )
 
-    ft = gensim.models.KeyedVectors.load_word2vec_format(os.getcwd() + "/embeddings/cc.bn.300.bin/cc.bn.300.vec")
+    ft = gensim.models.KeyedVectors.load_word2vec_format("../embeddings/cc.en.300.vec")
 
-    X_train = df_train["Data"]
-    X_test = df_test["Data"]
+    X_train = df_train["text"]
+    X_test = df_test["text"]
 
-    y_train = df_train["Label"]
-    y_test = df_test["Label"]
+    y_train = df_train["label"]
+    y_test = df_test["label"]
 
     vectorizer = Word2VecVectorizer(ft)
     Xtrain = vectorizer.fit_transform(X_train)
@@ -149,16 +154,17 @@ def embedding_feature(df_train, df_test, c):
     linear.fit(Xtrain, y_train)
 
     pred = linear.predict(Xtest)
+    print(pred)
 
     precision, recall, f1 = RecallPrecisionFScore(y_test, pred)
 
 
 def feature_based_combination(df_train, df_test, c, ux, uy, cx, cy):
-    X_train = df_train["Data"]
-    X_test = df_test["Data"]
+    X_train = df_train["text"]
+    X_test = df_test["text"]
 
-    y_train = df_train["Label"]
-    y_test = df_test["Label"]
+    y_train = df_train["label"]
+    y_test = df_test["label"]
 
     # word
     tfidf_vect_ngram_word = TfidfVectorizer(analyzer='word', ngram_range=(ux, uy))
@@ -185,15 +191,15 @@ def feature_based_combination(df_train, df_test, c, ux, uy, cx, cy):
 
 
 def feature_based(df_train, df_test, c, x1, y1, gram):
-    X_train = df_train["Data"]
-    X_test = df_test["Data"]
+    X_train = df_train["text"]
+    X_test = df_test["text"]
 
-    y_train = df_train["Label"]
-    y_test = df_test["Label"]
+    y_train = df_train["label"]
+    y_test = df_test["label"]
 
     tfidf_vect_ngram = TfidfVectorizer(analyzer=gram, ngram_range=(x1, y1), tokenizer=lambda x: x.split())
     tfidf_vect_ngram.fit(X_train)
-    feature_names = tfidf_vect_ngram.get_feature_names()
+    feature_names = tfidf_vect_ngram.get_feature_names_out()
     xtrain = tfidf_vect_ngram.transform(X_train)
     xtest = tfidf_vect_ngram.transform(X_test)
 
@@ -208,12 +214,12 @@ def feature_based(df_train, df_test, c, x1, y1, gram):
 if __name__ == '__main__':
     path_parent = os.path.dirname(os.getcwd())
     print(path_parent)
-    os.chdir(path_parent)
-    DATASET_PATH = '..\\dataset\\'
+    # os.chdir(path_parent)
+    # DATASET_PATH = '..\\dataset\\'
 
-    df_train = pd.read_csv(DATASET_PATH + "train_df.csv")
-    df_val = pd.read_csv(DATASET_PATH + "val_df.csv")
-    df_test = pd.read_csv(DATASET_PATH + "test_df.csv")
+    df_train = pd.read_csv("../data/train_df.csv")
+    df_val = pd.read_csv("../data/val_df.csv")
+    df_test = pd.read_csv("../data/test_df.csv")
 
     model_name = input("Please Specify the Model Name: ")
 
