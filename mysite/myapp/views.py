@@ -21,11 +21,11 @@ class SentimentViewSet(viewsets.ViewSet):
     """
     demo sentiments:
     negative:
-        The older interface was much simpler
+        It is not good at all.
     neutral: 
-        I don't think there is anything I really dislike about the product
-    positive:
         Text need to be analyzed
+    positive:
+        It is a good day.
     """
     # def list(self, request):
     #     serializer = SentimentSerializer()
@@ -46,21 +46,17 @@ class SentimentViewSet(viewsets.ViewSet):
             }
             return Response({"error": "invalid format",
                              "valid format": context}, status=HTTP_400_BAD_REQUEST)
+
+        print("post api is called: ", text)
+
         sentiment = None
-        model = None
         try:
-            # global isFineTuned
-            # if not isFineTuned:
-            #     sentiment = screen.screen(text, False)
-            #     isFineTuned = True
-            # else:
-            model, sentiment = screen.screen(model, text)
+            sentiment = screen.screen(text)
             print("sentiment: ", sentiment)
         except (TypeError, AttributeError, IOError) as err:
             return Response({"error": err}, status=HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             return Response({"error": e}, status=HTTP_500_INTERNAL_SERVER_ERROR)
-
 
         context = {
             'text': text,

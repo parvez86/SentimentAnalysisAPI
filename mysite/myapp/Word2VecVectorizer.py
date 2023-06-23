@@ -38,7 +38,7 @@ class Word2VecVectorizer:
             else:
                 emptycount += 1
             n += 1
-        print("Numer of samples with no words found: %s / %s" % (emptycount, len(data)))
+        print("Number of samples with no words found: %s / %s" % (emptycount, len(data)))
         return X
 
     def fit_transform(self, data):

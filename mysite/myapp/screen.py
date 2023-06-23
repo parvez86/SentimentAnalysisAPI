@@ -11,23 +11,18 @@ import gensim
 import os
 
 isFineTuned = False
-MODEL_PATH = str(settings.BASE_DIR)+ '\embeddings\cc.en.300.vec'
-# MODEL_PATH = '../embeddings/cc.en.300.vec'
-DATA_PATH = str(settings.BASE_DIR) + '\data'
-# DATA_PATH = '../data'
 SENTIMENT_NAMES = ["negative", "neutral", "positive"]
 model = None
+vectorizer = None
 
 
 def build_model():
-    # model = fasttext.load_model(MODEL_PATH)
-    # model = fasttext.train_supervised(input=r'train_reviews.csv', label_prefix='__label__')
     model_path = "embeddings/cc.en.300.vec"
     data_path = "data/train_df.csv"
 
-    path_parent = os.path.dirname(os.getcwd())
-    # os.chdir( path_parent )
-    print("data path: ", data_path)
+    # print("data path: ", data_path)
+
+    # read train data
     df_train = pd.read_csv(data_path, encoding='ISO-8859-1')
 
     # remove null
@@ -36,8 +31,6 @@ def build_model():
         df_train = df_train.dropna()
 
     # remove empty
-    # df_train['text'] = df_train[df_train['text'] != ""]
-    print("train data")
     X_train = df_train['text']
     X_train.apply(process_text)
     y_train = df_train["label"]
@@ -52,20 +45,19 @@ def build_model():
     linear = LinearSVC(C=c, penalty='l2', loss='squared_hinge')
 
     linear.fit(Xtrain, y_train)
-    return linear
+
+    # classification report
+    # get_classification_report(vectorizer, linear)
+
+    return vectorizer, linear
 
 
-def predict(model, review):
-    print("review: ", review)
-    pred = model.predict([review])
-    print("pred: ", pred)
-    return pred
-
-
-def get_classification_report(model):
+def get_classification_report(vectorizer, model):
     df_test = pd.read_csv('data/test_df.csv', encoding='ISO-8859-1')
     df_test.text.apply(process_text)
-    y_pred = model.predict(df_test.text)
+    data = df_test.text
+    data = vectorizer.transform(data)
+    y_pred = model.predict(data)
     y_true = df_test.label
     print(y_pred)
     report = classification_report(y_true, y_pred)
@@ -74,34 +66,32 @@ def get_classification_report(model):
 
 def get_model():
     global model
+    global vectorizer
     if not model:
         print("model 1st loading")
-        model = build_model()
+        vectorizer, model = build_model()
         print("model loaded")
         # print("model ",)
-    return model
+    return vectorizer, model
 
 
 def screen(text):
+    print(text)
     text = process_text(text)
-    global model
-    if not model:
-        print("None")
-    else:
-        print("model exist")
-    model = get_model()
-    # test_x = pd.Series(list(text))
-    print("data: ", [text])
-    print()
-    pred = model.predict(text)
-    print(model)
-    # pred=2
-    print("prediction: ", pred)
-    return model, SENTIMENT_NAMES[pred]
+    text = [text]
 
+    print("data: ", text)
+    try:
+        vectorizer, model = get_model()
+        print("model exist: ", (False if not model else True))
 
-if __name__ == '__main__':
-    model_path = '../embeddings/ccc.en.300.vec'
-    model = build_model()
-    get_classification_report(model)
-    print("Main thread")
+        data = vectorizer.transform(text)
+        pred = model.predict(data)
+        print(model)
+        print("prediction: ", pred)
+        return SENTIMENT_NAMES[pred[0]]
+
+    except (RuntimeError, TypeError, FileNotFoundError) as err:
+        print("err: ", err)
+        return ""
+
