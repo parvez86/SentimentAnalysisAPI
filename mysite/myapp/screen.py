@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.conf import settings
 from sklearn.metrics import classification_report, confusion_matrix
-from sklearn.svm import LinearSVC
+from sklearn.neural_network import MLPClassifier
 import pandas as pd
 import numpy as np
 
@@ -42,18 +42,21 @@ def build_model():
     vectorizer = Word2VecVectorizer(ft)
     Xtrain = vectorizer.fit_transform(X_train)
 
-    linear = LinearSVC(C=c, penalty='l2', loss='squared_hinge')
+    model = MLPClassifier(hidden_layer_sizes=(10, 10, 10))
 
-    linear.fit(Xtrain, y_train)
+    model.fit(Xtrain, y_train)
 
     # classification report
-    # get_classification_report(vectorizer, linear)
+    get_classification_report(vectorizer, model)
 
-    return vectorizer, linear
+    return vectorizer, model
 
 
 def get_classification_report(vectorizer, model):
     df_test = pd.read_csv('data/test_df.csv', encoding='ISO-8859-1')
+    if df_test.isnull().values.any():
+        print(df_test.isnull().sum())
+        df_test = df_test.dropna()
     df_test.text.apply(process_text)
     data = df_test.text
     data = vectorizer.transform(data)
