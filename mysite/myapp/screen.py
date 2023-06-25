@@ -47,7 +47,7 @@ def build_model():
     model.fit(Xtrain, y_train)
 
     # classification report
-    get_classification_report(vectorizer, model)
+    # get_classification_report(vectorizer, model)
 
     return vectorizer, model
 
