@@ -6,7 +6,7 @@ A django web backend server that has single api for collecting sentiment text as
 * train_df.csv
 * val_df.csv
 * test_df.csv
-* cc.en.300.vec
+* model_state.bin
 
 #### Files Format
 Column Title | Description
@@ -21,7 +21,7 @@ Requires the following packages:
 
 It is recommended to use virtual environment packages such as virtualenv. Follow the steps below to setup the project:
   - Clone this repository via `git clone https://github.com/parvez86/SentimentAnalysisAPI.git`
-  - Download the given vector model [cc.en.300.vec](https://drive.google.com/file/d/1-BTiCiy_opwnniwnS6_2bwd89nee5mse/view?usp=drive_link) and put it to the `embeddings` folder (beside the `data` folder).`
+  - Download the given optimized built model [model_state_cpu.bin](https://drive.google.com/file/d/1N60L3uA6fNyItlMvgA2Nqc-e-Wg2KZmq/view?usp=sharing) and put it to the `model` folder (beside the `data` folder). For gpu enabled model [model_state_gpu.bin](https://drive.google.com/file/d/1hbsH4Yc-ylegNjB8sJteeIK5E4QFsdth/view?usp=sharing) and rename the model file.
   - Use this command to install required packages `pip install -r requirements.txt`
   - Crate database and change database settings in `settings.py` according to your database.
     - **Mysql**:
