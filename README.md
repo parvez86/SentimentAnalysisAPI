@@ -23,7 +23,7 @@ It is recommended to use virtual environment packages such as virtualenv. Follow
   - Clone this repository via `git clone https://github.com/parvez86/SentimentAnalysisAPI.git`
   - Download the given vector model [cc.en.300.vec](https://drive.google.com/file/d/1-BTiCiy_opwnniwnS6_2bwd89nee5mse/view?usp=drive_link) and put it to the `embeddings` folder (beside the `data` folder).`
   - Use this command to install required packages `pip install -r requirements.txt`
-  - Change database settings in `settings.py` according to your database.
+  - Crate database and change database settings in `settings.py` according to your database.
     - **Mysql**:
        ```
         DATABASES = {
@@ -47,7 +47,7 @@ It is recommended to use virtual environment packages such as virtualenv. Follow
             }
         }
       ```
-    - **Others**: See documentation, add appropriate database settings and install connector.
+    - **Others**: See documentation, add put appropriate database settings and install connector.
   - Check Migrations of the project via terminal: `python manage.py makemigrations`
   - Migrate the project from terminal: `python manage.py migrate`
   - Create admin user for admin panel from terminal: `python manage.py createsuperuser`. And enter the username, email and password. 
