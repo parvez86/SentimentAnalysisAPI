@@ -20,8 +20,8 @@ Requires the following packages:
   - pip 22.3.1 or higher
 
 It is recommended to use virtual environment packages such as virtualenv. Follow the steps below to setup the project:
-  - Clone this repository via `git clone https://github.com/parvez86/SentimentAnalysisAPI.git
-  - Download the given vector model [cc.en.300.vec](https://drive.google.com/file/d/1-BTiCiy_opwnniwnS6_2bwd89nee5mse/view?usp=drive_link) and put it to the `embeddings` folder.`
+  - Clone this repository via `git clone https://github.com/parvez86/SentimentAnalysisAPI.git`
+  - Download the given vector model [cc.en.300.vec](https://drive.google.com/file/d/1-BTiCiy_opwnniwnS6_2bwd89nee5mse/view?usp=drive_link) and put it to the `embeddings` folder (beside the `data` folder).`
   - Use this command to install required packages `pip install -r requirements.txt`
   - Change database settings in `settings.py` according to your database.
     - **Mysql**:
