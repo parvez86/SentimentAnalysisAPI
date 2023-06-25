@@ -46,10 +46,11 @@ class SentimentViewSet(viewsets.ViewSet):
             return Response({"error": "invalid format",
                              "valid format": context}, status=HTTP_400_BAD_REQUEST)
         sentiment = None
+        print("in post method")
         try:
             sentiment = screen.screen(text)
             print("sentiment: ", sentiment)
-        except (TypeError, AttributeError, IOError) as err:
+        except (TypeError, AttributeError, IOError, OSError) as err:
             return Response({"error": err}, status=HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             return Response({"error": e}, status=HTTP_500_INTERNAL_SERVER_ERROR)
