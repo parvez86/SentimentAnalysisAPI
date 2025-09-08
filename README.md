@@ -1,5 +1,5 @@
 # SentimentAnalysisAPI
-A django web backend server that has single api for collecting sentiment text as json format, analyze them with an optimization of pretrained bert model and return the sentiment of the text as a json response.
+A Django web backend server that has a single API for collecting sentiment text in JSON format, analysing it with an optimisation of a pretrained BERT model and returning the sentiment of the text as a JSON response.
 
 #### Files Format
 Column Title | Description
@@ -13,9 +13,18 @@ Requires the following packages:
   - Django 4.0 or higher
   - pip 22.3.1 or higher
 
-It is recommended to use virtual environment packages such as virtualenv. Follow the steps below to setup the project:
+It is recommended to use virtual environment packages such as virtualenv. Follow the steps below to set up the project:
   - Clone this repository via `git clone https://github.com/parvez86/SentimentAnalysisAPI.git`
-  - Use this command to install required packages `pip install -r requirements.txt`
+  - Create and Activate a Virtual Environment (Recommended):
+      ```
+      Bash
+      python -m venv venv
+      # On Windows
+      .\venv\Scripts\activate
+      # On macOS/Linux
+      source venv/bin/activate
+      ```
+  - Use this command to install required packages: `pip install -r requirements.txt`
   - Crate database and change database settings in `settings.py` according to your database.
     - **Mysql**:
        ```
@@ -40,10 +49,10 @@ It is recommended to use virtual environment packages such as virtualenv. Follow
             }
         }
       ```
-    - **Others**: See documentation, add put appropriate database settings and install connector.
+    - **Others**: See documentation, add appropriate database settings and install the connector.
   - Check Migrations of the project via terminal: `python manage.py makemigrations`
   - Migrate the project from terminal: `python manage.py migrate`
-  - Create admin user for admin panel from terminal: `python manage.py createsuperuser`. And enter the username, email and password. 
+  - Create admin user for admin panel from terminal: `python manage.py createsuperuser`. Then enter the username, email and password. 
   - Run the project from terminal: `python manage.py runserver`
 
 # Usage
@@ -55,7 +64,7 @@ It is recommended to use virtual environment packages such as virtualenv. Follow
           "text": "write your sentences"
         }
       ```
-    - reponse will return:
+    - response will return:
       ```
         {
           "sentiment": "negative/neutral/positive"
